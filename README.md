@@ -4,7 +4,7 @@ Latent Bayesian skill models for predicting StarCraft II match outcomes, with a
 focus on **uncertainty** and the **limited-data regime**. Course project; final
 deliverable is a 4-page PDF report plus a separate code upload.
 
-## Why this design (read this first)
+## Why this design
 
 The full dataset has 999 players averaging ~386 matches each — nobody has fewer
 than 33 games. So naive skill estimates are easy and plain win-rate is a strong
@@ -24,9 +24,8 @@ pip install -r requirements.txt
 python -c "import pymc; print(pymc.__version__)"   # sanity check
 ```
 
-The dataset (`data/train.csv`, `data/valid.csv`) is already in the repo.
 
-## The plan in one line
+## The plan
 
 Elo baseline → Bayesian Bradley-Terry (the graphical model) → uncertainty
 analysis (data-size, cold-start, calibration) → race-effect extension.
@@ -50,7 +49,7 @@ python src/experiments.py calibration  # reliability diagram + ECE
 python src/experiments.py race         # learned race-matchup effects
 ```
 
-Outputs (`.json` + `.png`) land in `results/`.
+Outputs (`.json` + `.png`) in `results/`.
 
 ## Work split (3 people)
 
@@ -60,8 +59,6 @@ Outputs (`.json` + `.png`) land in `results/`.
 | **P2** | Bayesian model + inference (+ race extension) | 4 |
 | **P3** | The five experiments, plots, report assembly | 5–6 |
 
-Phase 0 (environment) is everyone. See `BUILD_GUIDE` (shared separately) for the
-full phase-by-phase instructions, code snippets, and "done when" checks.
 
 ## Repo layout
 
@@ -72,11 +69,6 @@ results/    generated json + png          (gitignored except .gitkeep)
 report/     the 4-page PDF goes here
 ```
 
-## Status
-
-All `src/` files are **skeletons** — function signatures and docstrings with
-`NotImplementedError`. Fill them in per the build guide. Nothing is implemented
-yet; that's the team's work.
 
 ## Dataset
 
