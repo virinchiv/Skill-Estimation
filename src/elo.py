@@ -1,5 +1,5 @@
 """
-Elo baseline.   [PHASE 3 - owner: P1]
+Elo baseline.
 
 NOT a graphical model -- this is the comparison point that shows whether the
 Bayesian model actually buys us anything. Elo gives a point estimate with NO

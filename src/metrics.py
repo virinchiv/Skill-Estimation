@@ -1,5 +1,5 @@
 """
-Shared evaluation metrics.   [PHASE 2 - owner: P1, used by all]
+Shared evaluation metrics.
 
 Every model outputs p = P(a beats b), so evaluation is identical regardless
 of model. This is the single source of truth for scoring. Implement each
