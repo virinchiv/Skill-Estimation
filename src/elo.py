@@ -19,16 +19,21 @@ class Elo:
 
     def prob(self, a, b):
         """P(a beats b) from current ratings."""
-        raise NotImplementedError("Phase 3 - P1")
+        return 1.0 / (1.0 + 10 ** ((self.r[b] - self.r[a]) / self.scale))
 
     def update(self, a, b, outcome):
         """Update both players' ratings after one match."""
-        raise NotImplementedError("Phase 3 - P1")
+        p = self.prob(a, b)
+        self.r[a] += self.k * (outcome - p)
+        self.r[b] += self.k * ((1 - outcome) - (1 - p))
 
     def fit(self, a, b, outcome):
         """Online pass through training matches (chronological order ideal)."""
-        raise NotImplementedError("Phase 3 - P1")
+        for ai, bi, oi in zip(a, b, outcome):
+            self.update(int(ai), int(bi), int(oi))
+        return self
+        
 
     def predict_proba(self, a, b):
         """Vector of P(a beats b) for arrays of matchups."""
-        raise NotImplementedError("Phase 3 - P1")
+        return np.array([self.prob(int(ai), int(bi)) for ai, bi in zip(a, b)])
