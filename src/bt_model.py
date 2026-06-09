@@ -56,8 +56,40 @@ def fit_bt_race(a, b, ra, rb, outcome, n_players, n_races=4,
     player pairs, or the signs will be wrong. Returns skill mean/std plus
     race-effect mean/std and the pair-index lookup.
     """
-    raise NotImplementedError("Phase 4 - P2 (extension)")
+    # Build pair-index and sign lookup tables for unordered race pairs
+    iu = np.triu_indices(n_races, k=1)
+    n_pairs = len(iu[0])
+    pair_id = -np.ones((n_races, n_races), dtype=int)
+    sign = np.zeros((n_races, n_races))
+    for k, (i, j) in enumerate(zip(*iu)):
+        pair_id[i, j] = k; sign[i, j] = 1.0    # canonical orientation: +
+        pair_id[j, i] = k; sign[j, i] = -1.0   # reverse: same effect, flipped
+    
+    # Drop matches with unknown race (-1) so indexing is safe
+    valid = (ra >= 0) & (rb >= 0)
+    a, b = a[valid], b[valid]
+    ra, rb, outcome = ra[valid], rb[valid], outcome[valid]
+    pidx = pair_id[ra, rb]                      # which effect each match uses
+    psign = sign[ra, rb]                        # +1 / -1 per match
 
+    with pm.Model() as model:
+        skill = pm.Normal("skill", 0.0, sigma, shape=n_players)
+        race_eff = pm.Normal("race_eff", 0.0, 0.5, shape=n_pairs)
+        logit = skill[a] - skill[b] + psign * race_eff[pidx]
+        pm.Bernoulli("obs", logit_p=logit, observed=outcome)
+        if method == "advi":
+            approx = pm.fit(n=30000, method="advi", random_seed=seed, progressbar=progress)
+            idata = approx.sample(draws)
+        elif method == "nuts":
+            idata = pm.sample(draws, tune=1000, chains=2, cores=1, random_seed=seed,
+                              progressbar=progress, target_accept=0.9)
+
+    sk = idata.posterior["skill"].stack(s=("chain", "draw")).values
+    re = idata.posterior["race_eff"].stack(s=("chain", "draw")).values
+    
+    return {"mean": sk.mean(axis=1), "std": sk.std(axis=1), "samples": sk,
+            "race_mean": re.mean(axis=1), "race_std": re.std(axis=1),
+            "pair_id": pair_id, "sign": sign, "idata": idata}
 
 def predict_proba(post, a, b):
     """Posterior predictive P(a beats b) by averaging sigmoid over samples."""
