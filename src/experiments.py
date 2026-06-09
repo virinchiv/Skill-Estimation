@@ -1,5 +1,5 @@
 """
-Experiment driver.   [PHASE 5 - owner: P3]
+Experiment driver.
 
 Each function below = ONE figure in the report. Run individually:
     python src/experiments.py elo

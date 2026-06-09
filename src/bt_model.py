@@ -1,5 +1,5 @@
 """
-Bayesian Bradley-Terry skill model.   [PHASE 4 - owner: P2]
+Bayesian Bradley-Terry skill model.
 
 This is the core graphical model that earns the grade.
 
@@ -28,7 +28,24 @@ def fit_bt(a, b, outcome, n_players, sigma=1.0, draws=1000,
     Returns a dict with per-player posterior 'mean' and 'std', the raw
     'samples' array (players x draws), and the inference 'idata'.
     """
-    raise NotImplementedError("Phase 4 - P2")
+    with pm.Model() as model:
+        skill = pm.Normal("skill", mu = 0.0, sigma = sigma, shape = n_players)
+        logit = skill[a] - skill[b]
+        pm.Bernoulli("obs", logit_p = logit, observed = outcome)
+        if method == "advi":
+            approx = pm.fit(n=30000, method="advi", random_seed=seed, progressbar=progress)
+            idata = approx.sample(draws)
+        elif method == "nuts":
+            idata = pm.sample(draws, tune=1000, chains=2, cores=1, random_seed=seed, 
+                              progressbar=progress, target_accept=0.9)
+    
+    sk = idata.posterior["skill"].stack(s=("chain", "draw")).values
+    return {
+        "mean": sk.mean(axis=1),
+        "std": sk.std(axis=1),
+        "samples": sk,
+        "idata": idata,
+    }
 
 
 def fit_bt_race(a, b, ra, rb, outcome, n_players, n_races=4,
@@ -44,4 +61,6 @@ def fit_bt_race(a, b, ra, rb, outcome, n_players, n_races=4,
 
 def predict_proba(post, a, b):
     """Posterior predictive P(a beats b) by averaging sigmoid over samples."""
-    raise NotImplementedError("Phase 4 - P2")
+    sk = post["samples"]
+    logit = sk[a] - sk[b]
+    return (1.0 / (1.0 + np.exp(-logit))).mean(axis=1)
