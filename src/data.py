@@ -83,7 +83,7 @@ def subsample_matches(df, target_player, n_keep, seed=0):
     plus ALL matches among everyone else. Simulates a 'new' player."""
     rng = np.random.default_rng(seed)
     involves = (df["winner"] == target_player) | (df["loser"] == target_player)
-    target_rows = df.index[involves].to_numpy()
+    target_rows = df.index[involves].to_numpy().copy()
     rng.shuffle(target_rows)
     keep_target = set(target_rows[:n_keep])
     keep = (~involves) | df.index.isin(keep_target)
