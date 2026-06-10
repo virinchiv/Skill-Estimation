@@ -57,7 +57,7 @@ def exp_compare():
     m = evaluate(p, va_o)
     m["ece"] = expected_calibration_error(p, va_o)
     json.dump(m, open(f"{RESULTS}/bt_full.json", "w"), indent=2)
-    print("BT full:", max)
+    print("BT full:", m)
 
 
 def exp_datasize():
