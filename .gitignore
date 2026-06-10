@@ -6,10 +6,6 @@ venv/
 env/
 .ipynb_checkpoints/
 
-# Generated experiment outputs (keep the folder, not the files)
-results/*
-!results/.gitkeep
-
 # OS / editor
 .DS_Store
 *.swp
